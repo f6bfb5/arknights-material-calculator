@@ -28,11 +28,14 @@ npm run lint
 
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-## Arknights
+## Arknights Material Calculator
 
-[【アークナイツ】素材入手場所まとめ | 素材アイテム一覧 - GameWith](https://gamewith.jp/arknights/article/show/183912)
-[【アークナイツ】昇進素材のおすすめ周回場所 | 効率のいい集め方 - GameWith](https://gamewith.jp/arknights/article/show/183726)
+- [【アークナイツ】素材入手場所まとめ | 素材アイテム一覧 - GameWith](https://gamewith.jp/arknights/article/show/183912)
+- [【アークナイツ】昇進素材のおすすめ周回場所 | 効率のいい集め方 - GameWith](https://gamewith.jp/arknights/article/show/183726)
 
+### Materials List
+
+```
 a: "エステル素材",
 b: "アケトン素材",
 c: "源岩素材",
@@ -46,7 +49,11 @@ j: "マンガン素材",
 k: "ゲル素材",
 l: "熾合金素材",
 m: "複合"
+```
 
+### Per Material Detail
+
+```
 A. エステル素材
 a-1 1 エステル原料 酯原料 mate_1 "X" 4-5
 a-2 2 初級エステル 聚酸酯 mate_10 "3a1" 3-2
@@ -111,47 +118,60 @@ M. 複合
 m-1 D32 鋼 D32 鋼 mate_65 5 "1j2+1i2+1g2" X
 m-2 ナノフレーク 雙極納米片 mate_66 5 "1e4+2h2" X
 m-3 融合剤 聚合劑 mate_67 5 "1c4+1d4+1b4" X
+```
 
+### Object Architecture
+
+```
 [
-0: {
-...
-id: (...)
-...
-need: (...)
-own: (...)
-...
-recipe: (...)
-},
-(...)
+  0: {
+    ...
+    id: (...)
+    ...
+    need: (...)
+    own: (...)
+    ...
+    recipe: (...)
+  },
+  (...)
 ]
+```
 
-e-3 own 3 need 0 "4e2"
-e-4 own 0 need 1 "2e3+1c3+1i1"
+### 轉換處理紀錄
 
 1. 取出需求 > 0
-   let materials_need = this.materials.filter((item) => item.need > 0);
-   let materials_own = this.materials.filter((item) => item.own > 0);
+
+```js
+let materials_need = this.materials.filter((item) => item.need > 0);
+let materials_own = this.materials.filter((item) => item.own > 0);
+```
 
 2. 換算成總共需要的素材表
+
+```js
    let needTable = new Map();
    materials_need.forEach((material) =>
    material.recipe.split("+") // "2e3+1c3+1i1" -> ["2e3", "1c3", "1i1"]
    .forEach((recipe) => {
    let key = recipe.slice(1); // "2e3" -> "e3"
-   let value = material.need \* parseInt(recipe.slice(0,1)); // "2e3" -> 2
+   let value = material.need * parseInt(recipe.slice(0,1)); // "2e3" -> 2
    if( needTable.has(key) ) needTable[key] = needTable[key] + value;
    else needTable[key] = value;
    })
    console.log(needTable);
+```
 
-3. 素材表 \* 需求量 - 已持有
+3. `素材表 * 需求量 - 已持有`
 
-materials_need.forEach((item) =>
-needTable[item.id] \* (item.need))
+```js
+materials_need.forEach((item) => needTable[item.id] * item.need);
+```
 
 4. 依照換算素材稀有基準 由上往下換
 
 5. 加總回傳一新陣列
+
+## 參考資料
 
 - [Button Group | Components | BootstrapVue](https://bootstrap-vue.org/docs/components/button-group)
 - [Components Basics — Vue.js](https://vuejs.org/v2/guide/components.html)
